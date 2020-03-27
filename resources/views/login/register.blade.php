@@ -31,21 +31,16 @@
         </div>
         <h3>欢迎注册 H+</h3>
         <p>创建一个H+新账户</p>
-        <form class="m-t" role="form" action="login.html">
+        <form class="m-t" role="form" method="post" action="/login/register_do">
+            @csrf
             <div class="form-group">
-                <input type="text" class="form-control" placeholder="请输入用户名" required="">
+                <input type="text" name="name" class="form-control" placeholder="请输入用户名" required="">
             </div>
             <div class="form-group">
-                <input type="password" class="form-control" placeholder="请输入密码" required="">
+                <input type="password" name="password" class="form-control" placeholder="请输入密码" required="">
             </div>
             <div class="form-group">
-                <input type="password" class="form-control" placeholder="请再次输入密码" required="">
-            </div>
-            <div class="form-group text-left">
-                <div class="checkbox i-checks">
-                    <label class="no-padding">
-                        <input type="checkbox"><i></i> 我同意注册协议</label>
-                </div>
+                <input type="password" name="password1" class="form-control" placeholder="请再次输入密码" required="">
             </div>
             <button type="submit" class="btn btn-primary block full-width m-b">注 册</button>
 
