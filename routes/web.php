@@ -30,3 +30,20 @@ Route::prefix('/student')->group(function () {
 
 });
 
+Route::prefix('/Admin')->group(function () {
+    Route::any('/index', 'IndexController@index');
+
+});
+
+
+Route::prefix('brand')->group(function () {
+    Route::any('/show', 'Admin\BrandController@show');
+    Route::get('/add', 'Admin\BrandController@add');
+    Route::post('/add_do', 'Admin\BrandController@add_do');
+    Route::get('/update/{id}', 'Admin\BrandController@update');
+    Route::any('/update_do/{id}', 'Admin\BrandController@update_do');
+    Route::get('/delete/{id}', 'Admin\BrandController@delete');
+    Route::any('/del', 'Admin\BrandController@del');
+    Route::any('/checkname', 'Admin\BrandController@checkname');
+});
+
