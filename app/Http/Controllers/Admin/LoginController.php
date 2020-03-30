@@ -25,7 +25,7 @@ class LoginController extends Controller
                 'name' => $res['name'],
             ];
             request()->session()->put('info',$info);
-            echo "<script>alert('登陆成功');location='/admin/index'</script>";
+            echo "<script>alert('登陆成功');location='/student/show'</script>";
         }else{
             echo "<script>alert('账号或密码错误');location='/login/login'</script>";exit;
         }
