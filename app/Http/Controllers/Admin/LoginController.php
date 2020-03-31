@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\LoginModel;
 use App\Models\RegisterModel;
 use phpqrcode;
-
+use function Symfony\Component\Console\Tests\Command\createClosure;
+use App\Tools\sms\demo;
 
 class LoginController extends Controller
 {
@@ -17,6 +18,7 @@ class LoginController extends Controller
     public function login_do(Request $request){
         unset($request->_token);
         $password=md5($request->password);
+//        dd($password);
         $where=['password'=>$password,'name'=>$request->name];
         $res=LoginModel::where($where)->first();
         if ($res) {
@@ -25,7 +27,7 @@ class LoginController extends Controller
                 'name' => $res['name'],
             ];
             request()->session()->put('info',$info);
-            echo "<script>alert('登陆成功');location='/student/show'</script>";
+            echo "<script>alert('登陆成功');location='/brand/show'</script>";
         }else{
             echo "<script>alert('账号或密码错误');location='/login/login'</script>";exit;
         }
@@ -85,4 +87,24 @@ class LoginController extends Controller
                 return view('login/png');
 //        return view('login/png',['png'=>$png]);
     }
+    public function send(Request $request){
+        $str='8917489149162371694698782913';
+        $value =$request->value;
+//        dd($value);
+        $sendCode=substr(str_shuffle($str),rand(0,15),6);
+//        dd($sendCode);
+        $res =sendSms($value,$sendCode);
+        if ($res->Message=='OK'){
+            $codeInfo=[
+            'sendCode'=>$sendCode,
+            'sendTime'=>time()
+            ];
+            session('codeInfo',$codeInfo);
+            successly('发送成功');
+        }else{
+            fail('发送失败');
+        }
+
+    }
+
 }
