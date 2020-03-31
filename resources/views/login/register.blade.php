@@ -62,6 +62,7 @@
 <script src="/js/bootstrap.min.js?v=3.3.6"></script>
 <!-- iCheck -->
 <script src="/js/plugins/iCheck/icheck.min.js"></script>
+<script src="/js/laravel-sms.js"></script>
 <script>
     $(document).ready(function () {
         $('.i-checks').iCheck({
@@ -69,47 +70,65 @@
             radioClass: 'iradio_square-green',
         });
     });
-    $(function () {
-        var second = 60;// 设置倒计时秒数
-        var _time;//设置全局变里放定时器(方便清除定时器)
-        //给获取的获取绑定一个点击事件
-        $('.btn').click(function () {
-            var _this = $(this);
-            //获取手机号或邮箱的值
-            var _value = _this.parent('div').prev('div').find('input').val();
-            if (_value == '') {
-                alert('手机号或邮箱不能为空');
-            }
-                $.ajax({
-                    type: "post",
-                    url: "/login/send",
-                    data: {value:_value,'_token':'{{csrf_token()}}'},
-                    dataType:'json',
-                    succcess: function (msg) {
-                        if (msg.code == 1) {
-                            //如果发送成功将获取改为60s
-                            _this.find('span').text(second + 's');
-                            _time = setInterval(secondTelTime, 1000);
-                        }
-                    },
-                });
-
-        });
-        //手机号发送秒数倒计时
-        function secondTelTime() {
-            //获取span_tel
-            var second = parseInt($('#span_tel').text());
-            if (second == 0) {
-                $('#span_tel').text('获取');
-                clearInterval(_time);
-                $('#span_te1').parent('a').css('pointer-events', 'auto');
-            } else {
-                second = second - 1;
-                $('#span_tel').text(second + 's');
-                $('#span_te1').parent('a').css('pointer-events', 'none');
-            }
+    $('.btn').sms({
+        //laravel csrf token
+        token       : "{{csrf_token()}}",
+        //请求间隔时间
+        interval    : 60,
+        //请求参数
+        requestData : {
+            //手机号
+            mobile : function () {
+//                return $('#tel_code').val();
+                return '18337357571';
+            },
+            //手机号的检测规则
+            // mobile_rule : 'mobile_required'
         }
     });
+
+
+    {{--$(function () {--}}
+        {{--var second = 60;// 设置倒计时秒数--}}
+        {{--var _time;//设置全局变里放定时器(方便清除定时器)--}}
+        {{--//给获取的获取绑定一个点击事件--}}
+        {{--$('.btn').click(function () {--}}
+            {{--var _this = $(this);--}}
+            {{--//获取手机号或邮箱的值--}}
+            {{--var _value = _this.parent('div').prev('div').find('input').val();--}}
+            {{--if (_value == '') {--}}
+                {{--alert('手机号或邮箱不能为空');--}}
+            {{--}--}}
+                {{--$.ajax({--}}
+                    {{--type: "post",--}}
+                    {{--url: "/login/send",--}}
+                    {{--data: {value:_value,'_token':'{{csrf_token()}}'},--}}
+                    {{--dataType:'json',--}}
+                    {{--succcess: function (msg) {--}}
+                        {{--if (msg.code == 1) {--}}
+                            {{--//如果发送成功将获取改为60s--}}
+                            {{--_this.find('span').text(second + 's');--}}
+                            {{--_time = setInterval(secondTelTime, 1000);--}}
+                        {{--}--}}
+                    {{--},--}}
+                {{--});--}}
+
+        {{--});--}}
+        {{--//手机号发送秒数倒计时--}}
+        {{--function secondTelTime() {--}}
+            {{--//获取span_tel--}}
+            {{--var second = parseInt($('#span_tel').text());--}}
+            {{--if (second == 0) {--}}
+                {{--$('#span_tel').text('获取');--}}
+                {{--clearInterval(_time);--}}
+                {{--$('#span_te1').parent('a').css('pointer-events', 'auto');--}}
+            {{--} else {--}}
+                {{--second = second - 1;--}}
+                {{--$('#span_tel').text(second + 's');--}}
+                {{--$('#span_te1').parent('a').css('pointer-events', 'none');--}}
+            {{--}--}}
+        {{--}--}}
+    {{--});--}}
 
 
 </script>

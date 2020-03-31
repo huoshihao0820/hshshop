@@ -47,7 +47,7 @@
 
             <p class="text-muted text-center">
                 <a href="login.html#"><small>忘记密码了？</small></a> | <a href="/login/register">注册一个新账号</a> | <a
-                        href="/login/wechatout">微信登录</a>
+                        href="/login/wechatout" class="noname-login">微信登录</a>
             </p>
 
         </form>
@@ -57,7 +57,28 @@
 <!-- 全局js -->
 <script src="/js/jquery.min.js?v=2.1.4"></script>
 <script src="/js/bootstrap.min.js?v=3.3.6"></script>
-
+<script src="http://res.wx.qq.com/connect/zh_CN/htmledition/js/wxLogin.js"></script>
+<script>
+        $(document).on("click", ".noname-login", function () {//登录按钮触发事件
+        $(".layer").removeClass("hide");
+        var data = {};
+        var html = template('login-box', data);
+        var url = '{!!env("APP_URL")!!}logincallback/'+merchant.hash;
+        var callbackUrl = encodeURIComponent(url);
+        document.getElementById('layer-box').innerHTML = html;
+        var timestamp = (new Date()).valueOf();
+        var state = timestamp+Math.floor(Math.random()*100);
+        var obj = new WxLogin({//之前的代码是点击按钮之后弹出登录弹框 然后实例化这个类 id表示放这个二维码的div的id
+            id: "ewimg",
+            appid: "{{env('WXOPEN_APP_ID')}}",
+            scope: "snsapi_login",//扫码登录用这个参数 参数固定
+            redirect_uri: callbackUrl,//扫码之后成功的回调
+            state: state,//随机数
+            style: "",
+            href: ""
+        });
+    });
+</script>
 
 
 

@@ -19,7 +19,7 @@ Route::post('/login/login_do','Admin\LoginController@login_do');
 Route::get('/login/register','Admin\LoginController@register');
 Route::post('/login/register_do','Admin\LoginController@register_do');
 Route::get('/login/wechatout','Admin\LoginController@wechatout');
-Route::post('/login/send','Admin\LoginController@send');
+Route::any('/login/send','Admin\LoginController@send');
 
 Route::prefix('/student')->middleware('checklogin')->group(function () {
     Route::any('/show', 'StudentController@show');
@@ -31,8 +31,8 @@ Route::prefix('/student')->middleware('checklogin')->group(function () {
 
 });
 
-Route::prefix('/Admin')->group(function () {
-    Route::any('/index', 'IndexController@index');
+Route::prefix('/index')->group(function () {
+    Route::any('/index', 'Admin\IndexController@index');
 
 });
 //->middleware('checklogin')

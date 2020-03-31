@@ -9,15 +9,15 @@
 
 namespace App\Tools\sms\demo;
 
-require_once  "../../sms/SignatureHelper.php";
+require_once  "../SignatureHelper.php";
 
-use sms\SignatureHelper;
+use App\Tools\sms\SignatureHelper;
 
 
 /**
  * 发送短信
  */
-function sendSms() {
+function sendSms($value,$sendCode) {
 
     $params = array ();
 
@@ -30,7 +30,7 @@ function sendSms() {
     $accessKeySecret = "JbY7YkLQF5r3iY35h6dLi9LZR9fwIo";
 
     // fixme 必填: 短信接收号码
-    $params["PhoneNumbers"] = "17631350128";
+    $params["PhoneNumbers"] = $value;
 
     // fixme 必填: 短信签名，应严格按"签名名称"填写，请参考: https://dysms.console.aliyun.com/dysms.htm#/develop/sign
     $params["SignName"] = "霍世豪";
@@ -40,7 +40,7 @@ function sendSms() {
 
     // fixme 可选: 设置模板参数, 假如模板中存在变量需要替换则为必填项
     $params['TemplateParam'] = Array (
-        "code" => "123456",
+        "code" =>$sendCode,
     );
 
     // fixme 可选: 设置发送短信流水号
@@ -80,4 +80,4 @@ set_time_limit(0); // 防止脚本超时，仅用于测试使用，生产环境�
 header("Content-Type: text/plain; charset=utf-8"); // 输出为utf-8的文本格式，仅用于测试
 
 // 验证发送短信(SendSms)接口
-print_r(sendSms());
+print_r(sendSms($value,$sendCode));

@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Recognition;
+use function App\Tools\create_qrcode;
+use function App\Tools\sms\demo\sendSms;
 use Illuminate\Http\Request;
 use App\Models\LoginModel;
 use App\Models\RegisterModel;
 use phpqrcode;
 use function Symfony\Component\Console\Tests\Command\createClosure;
-use App\Tools\sms\demo;
 
 class LoginController extends Controller
 {
@@ -77,15 +79,28 @@ class LoginController extends Controller
         header("location:$url");
     }
     public function wechatout(){
+        $app_id = 'wx7c92fdcfe8f861ab';
+        $app_secret = 'edee5f9219b0b3597977fc2adece249a';
 
-        $uid = uniqid();
+            $url='https://api.weixin.qq.com/sns/oauth2/access_token?appid='.$app_id.'&secret='.$app_secret.'&code='.$_GET['code'].'&grant_type=authorization_code';
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+            curl_setopt($ch, CURLOPT_URL, $url);
+            $json =  curl_exec($ch);
+            curl_close($ch);
+            $arr=json_decode($json,1);
+            //用获取到的access_token调用接口
 
-        $url = "http://hshshop.lqove.xyz/oauth.php?uid=".$uid;
-        $obj = new \QRcode();
-
-        $png=$obj->png($url,'/1.png');
-                return view('login/png');
-//        return view('login/png',['png'=>$png]);
+//拼接URL的参数也不需要赘述了
+         $url='https://api.weixin.qq.com/sns/userinfo?access_token='.$arr['access_token'].'&openid='.$arr['openid'].'&lang=zh_CN';
+         $ch = curl_init();
+         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+         curl_setopt($ch, CURLOPT_URL, $url);
+         $json =  curl_exec($ch);
+         curl_close($ch);
+         $userinfo=json_decode($json,1);
     }
     public function send(Request $request){
         $str='8917489149162371694698782913';
@@ -94,15 +109,16 @@ class LoginController extends Controller
         $sendCode=substr(str_shuffle($str),rand(0,15),6);
 //        dd($sendCode);
         $res =sendSms($value,$sendCode);
-        if ($res->Message=='OK'){
+        if ($res==1){
             $codeInfo=[
             'sendCode'=>$sendCode,
             'sendTime'=>time()
             ];
             session('codeInfo',$codeInfo);
-            successly('发送成功');
+            echo "<script>alert('发送成功');</script>";
         }else{
-            fail('发送失败');
+            echo "<script>alert('发送失败');</script>";
+
         }
 
     }
