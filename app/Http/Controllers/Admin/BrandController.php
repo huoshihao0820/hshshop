@@ -43,7 +43,7 @@ class BrandController extends Controller
             $where[]=[$key,'=',$keyval];
         }
         $pagesize=config('app.pageSize');
-        $BrandInfo=BrandModel::where($where)->paginate($pagesize);
+        $BrandInfo=BrandModel::where($where)->orderBy('tp','Desc')->paginate($pagesize);
         return view('brand/show',['BrandInfo'=>$BrandInfo],compact('query'));
     }
     public function delete(request $request,$id){
@@ -97,5 +97,41 @@ class BrandController extends Controller
         }else{
             echo"2";
         }
+    }
+    public function toupiao(Request $request){
+        $query=$request->all();
+        $s_name=$request->s_name;
+        $key=$request->key;
+        $keyval=$request->keyval;
+        $where=[];
+        if ($s_name){
+            $where[]=['s_name','like',"%".$s_name."%"];
+        }
+
+        if ($key){
+            $where[]=[$key,'=',$keyval];
+        }
+        $pagesize=config('app.pageSize');
+        $BrandInfo=BrandModel::where($where)->orderBy('tp','Desc')->paginate($pagesize);
+        return view('brand/toupiao',['BrandInfo'=>$BrandInfo],compact('query'));
+
+
+    }
+    public function tp(Request $request){
+        $id=$request->s_id;
+//        echo $id;
+        $aa=BrandModel::where('s_id',$id)->first()->toArray();
+        $data=[
+            'tp'=>$aa['tp']+1
+        ];
+        $BrandModel=new BrandModel;
+
+        $res=$BrandModel->where(['s_id'=>$id])->update($data);
+        if ($res){
+            echo "1";
+        }else{
+            echo"2";
+        }
+
     }
 }

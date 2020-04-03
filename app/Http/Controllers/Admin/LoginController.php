@@ -42,65 +42,94 @@ class LoginController extends Controller
         $data = $request->all();
 //        dd($data);
         unset($data['_token']);
-        if ($request->password == $request->password1){
-            unset($data['password1']);
-        }else{
-            echo "<script>alert('密码不一致');location='/login/register'</script>";
-        }
-//        dd($data);
-        $data['password']=md5($data['password']);
-        $res=RegisterModel::insert($data);
-        if ($res){
-            echo "<script>alert('注册成功');location='/login/login'</script>";
-        }else{
-            echo "<script>alert('注册失败');location='/login/register'</script>";
+        $where=['code'=>$request->code];
+        $res=LoginModel::where($where)->first();
+        if ($res) {
 
+            if ($request->password == $request->password1) {
+                unset($data['password1']);
+            } else {
+                echo "<script>alert('密码不一致');location='/login/register'</script>";
+            }
+//        dd($data);
+            $data['password'] = md5($data['password']);
+            $res = RegisterModel::insert($data);
+            if ($res) {
+                echo "<script>alert('注册成功');location='/login/login'</script>";
+            } else {
+                echo "<script>alert('注册失败');location='/login/register'</script>";
+
+            }
+        }else{
+            echo "<script>alert('验证码不对');location='/login/register'</script>";die;
         }
     }
     public function wechat(){
-            $code = $_GET['code'] ;
-            $id = "wx67c8029efcf27af9";
-            $secret = "94fc0954d8548a02bf0b7dc8e0b36453";
-            $tokenurl = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=$id&secret=$secret&code=$code&grant_type=authorization_code";
-            $res = file_get_contents ( $tokenurl);
-            $token = json_decode( $res, true) ['access_token'];
-            $openid = json_decode( $res, true) ['openid'];
-            $userurl = "https://api.weixin.qq.com/sns/userinfo?access_token=$token&openid=$openid&Lang=zh_CN";
-            $userinfo = file_get_contents($userurl);
-            $user = json_decode ( $userinfo, true);
-            print_r($user);
-            echo "<img src=".$user['headimgurl']." /> ";
-
-
         $uid = $_GET['uid'];
-        $id = "wx67 c8029efcf27af9" ;
-        $url = urlencode("http://zhiboba.aulei521.com/login.php");
+        session(['u_id' => $uid]);
+        $appid = 'wx7c92fdcfe8f861ab';
+        $uri = urlencode("http://hshshop.lqove.xyz/login/log");
+        $url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=$appid&redirect_uri=$uri&response_type=code&scope=snsapi_userinfo&state=$uid#wechat_redirect";
+//        dd($url);
+        return redirect($url);
+//        $url = urlencode("http://zhiboba.aulei521.com/login.php");
 
-        header("location:$url");
     }
     public function wechatout(){
         $app_id = 'wx7c92fdcfe8f861ab';
         $app_secret = 'edee5f9219b0b3597977fc2adece249a';
+        $url = public_path('phpqrcode.php');
+        include($url);
+        $obj = new phpqrcode\QRcode();
+        $uid = uniqid();
+//        echo $uid;die;
+        $url = "http://hshshop.lqove.xyz/login/wechat?uid=".$uid;
+//        dd($url);
+        $obj->png($url,public_path('2.png'));
 
-            $url='https://api.weixin.qq.com/sns/oauth2/access_token?appid='.$app_id.'&secret='.$app_secret.'&code='.$_GET['code'].'&grant_type=authorization_code';
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-            curl_setopt($ch, CURLOPT_URL, $url);
-            $json =  curl_exec($ch);
-            curl_close($ch);
-            $arr=json_decode($json,1);
-            //用获取到的access_token调用接口
+        return redirect('/login/img');
 
-//拼接URL的参数也不需要赘述了
-         $url='https://api.weixin.qq.com/sns/userinfo?access_token='.$arr['access_token'].'&openid='.$arr['openid'].'&lang=zh_CN';
-         $ch = curl_init();
-         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-         curl_setopt($ch, CURLOPT_URL, $url);
-         $json =  curl_exec($ch);
-         curl_close($ch);
-         $userinfo=json_decode($json,1);
+    }
+    public function show(){
+        echo $_GET['echostr'];
+    }
+    public function log(){
+        $code = $_GET['code'];
+//            dd($code);
+        $id = "wx7c92fdcfe8f861ab";
+        $u_id = session('u_id');
+        $secret = "edee5f9219b0b3597977fc2adece249a";
+        $tokenurl = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=$id&secret=$secret&code=$code&grant_type=authorization_code";
+        $res = file_get_contents($tokenurl);
+        $token = json_decode($res, true)['access_token'];
+        $openid = json_decode($res, true)['openid'];
+        session(['openid' => $openid]);
+        $userurl = "https://api.weixin.qq.com/sns/userinfo?access_token=$token&openid=$openid&lang=zh_CN";
+        $userinfo = file_get_contents($userurl);
+        $user = json_decode($userinfo, true);
+        echo '</br>';
+        echo '微信昵称：' . $user['nickname'];
+        echo '</br>';
+        echo '微信头像：' . "<img src=" . $user['headimgurl'] . " />";
+        echo '<hr>';
+        $data=[
+          'wname'=>$user['nickname']
+        ];
+        $where=['wname'=>$user['nickname']];
+        $res=LoginModel::where($where)->first();
+        if ($res){
+            echo '<h2 style="color: red">您已经使我们的老客户了不需要绑定直接登录</h2>';
+        }else{
+            echo '你还没有绑定手机号<a href="/login/bd"><h2 style="color: red">点击去绑定</h2></a>';
+
+        }
+
+    }
+    public function bd(){
+        return view('login/bd');
+    }
+    public function img(){
+        return view('/login/img');
     }
     public function send(Request $request){
         $str='8917489149162371694698782913';

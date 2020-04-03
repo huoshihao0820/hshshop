@@ -1,6 +1,6 @@
 <?php
 
-
+use App\Models\RegisterModel;
 return [
     /*
     |------------------------------------------ --------------------------------
@@ -80,6 +80,10 @@ return [
     |
     */
     'content' => function ($code, $minutes, $input) {
+        $data=[
+          'code'=>$code
+        ];
+        $res=RegisterModel::insert($data);
         return '【signature】您的验证码是' . $code . '，有效期为' . $minutes . '分钟，请尽快验证。';
     },
 

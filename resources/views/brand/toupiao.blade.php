@@ -11,9 +11,6 @@
     <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
 </head>
 <body>
-<lu>
-    <li><a href="{{ url('/brand/add') }}">分类添加</a></li>
-</lu>
 <form action="">
     图书名称:<input type="text" name="s_name">
     <select name="key" id="key">
@@ -25,11 +22,9 @@
         <option value="0">展示</option>
         <option value="1">不展示</option>
     </select>
+
     <input type="submit" value="搜索">
-    <br>
-
 </form>
-
 <script>
     $('#key').change(function () {
         var _this=$(this).val();
@@ -39,33 +34,30 @@
         }
     })
 </script>
-    <table border="1">
-        <tr>
-            <td><input type="checkbox" class="allbox"></td>
-            <td>图书名称</td>
-            <td>图书网址</td>
-            <td>状态</td>
-            <td>管理</td>
-        </tr>
-        @foreach($BrandInfo as $v)
+<table border="1">
+    <tr>
+        <td><input type="checkbox" class="allbox"></td>
+        <td>图书名称</td>
+        <td>图书网址</td>
+        <td>状态</td>
+        <td>管理</td>
+    </tr>
+    @foreach($BrandInfo as $v)
         <tr s_id="{{ $v->s_id }}">
-            <td>
-                <input type="checkbox" class="box">
+            <td><input type="checkbox" class="box">
                 <span><?php if ($v->tp>5){ echo '高';}else{ echo '';}?></span>
             </td>
             <td>{{ $v->s_name }}</td>
             <td>{{ $v->s_wang }}</td>
-           <td>@if($v->is_show==0)展示@else不展示@endif</td>
+            <td>@if($v->is_show==0)展示@else不展示@endif</td>
             <td>
-                <a href="{{ url('brand/update/'.$v->s_id) }}">修改</a>
-                | <button class="mybut">删除</button>
-                <a href="{{ url('brand/delete/'.$v->s_id) }}">删除</a>
+                 <button class="mybut">投票</button>
             </td>
         </tr>
-        @endforeach
-    </table>
+    @endforeach
+</table>
 {{ $BrandInfo->appends($query)->links() }}
-<a href="/brand/toupiao">投票</a>
+
 </body>
 </html>
 <script>
@@ -78,15 +70,15 @@
         var s_id=$(this).parents('tr').attr('s_id')
         $.ajax({
             method:"POST",
-            url:"/brand/del",
+            url:"/brand/tp",
             data:{s_id:s_id},
         }).done(function (msg) {
-           if (msg==1){
-
+            if (msg==1){
                 location.reload()
-           }else{
-                alert('删除失败')
-           }
+                alert('投票成功')
+            }else{
+                alert('投票失败')
+            }
         })
     });
 
